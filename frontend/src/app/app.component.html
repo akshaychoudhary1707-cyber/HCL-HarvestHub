@@ -1,0 +1,30 @@
+<!-- Full App Layout Shell -->
+<div class="app-layout" [class.authenticated]="authService.isAuthenticated()">
+  <!-- Top Navigation Bar (Only for Authenticated Users) -->
+  <app-navbar
+    *ngIf="authService.isAuthenticated()"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-navbar>
+
+  <div class="app-body" *ngIf="authService.isAuthenticated(); else guestView">
+    <!-- Sidebar Navigation -->
+    <app-sidebar
+      [isOpen]="sidebarOpen"
+      (closeSidebar)="closeSidebarOnMobile()"
+    ></app-sidebar>
+
+    <!-- Main Content Area with Router Outlet -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <!-- Guest View (Login / Signup Pages) -->
+  <ng-template #guestView>
+    <main class="guest-container">
+      <router-outlet></router-outlet>
+    </main>
+  </ng-template>
+</div>

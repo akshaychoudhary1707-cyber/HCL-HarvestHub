@@ -1,0 +1,254 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">Crops Knowledge Base</h1>
+      <p class="page-subtitle">Standard agronomic encyclopedia of crops, cultivation seasons, and harvest timelines.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-create" (click)="openAddModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Add New Crop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="stats-strip">
+    <div class="stat-pill">
+      <span class="pill-title">Total Crops Available:</span>
+      <span class="pill-number">{{ crops.length }}</span>
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="toolbar">
+    <div class="search-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search crops by name, category, or season..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="filter-controls">
+      <!-- Season Filter -->
+      <div class="filter-item">
+        <label>Season:</label>
+        <select [(ngModel)]="selectedSeasonFilter" class="select-filter">
+          <option *ngFor="let s of seasons" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <!-- Type Filter -->
+      <div class="filter-item">
+        <label>Type:</label>
+        <select [(ngModel)]="selectedTypeFilter" class="select-filter">
+          <option *ngFor="let t of cropTypes" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="alert-error" *ngIf="errorMessage">
+    <span>{{ errorMessage }}</span>
+    <button (click)="loadCrops()" class="btn-retry">Retry</button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading crops catalog...</p>
+  </div>
+
+  <!-- Crops Grid -->
+  <div class="crops-grid" *ngIf="!isLoading && filteredCrops.length > 0">
+    <div class="crop-card" *ngFor="let crop of filteredCrops">
+      <div class="crop-header">
+        <div class="crop-avatar">🌱</div>
+        <div class="crop-titles">
+          <h3 class="crop-name">{{ crop.crop_name }}</h3>
+          <span class="crop-category">{{ crop.crop_type }}</span>
+        </div>
+      </div>
+
+      <div class="crop-badges-row">
+        <span class="badge-season">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+          </svg>
+          {{ crop.crop_season }}
+        </span>
+        <span class="badge-days">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          {{ crop.growing_days }} Days
+        </span>
+      </div>
+
+      <div class="crop-card-footer">
+        <button class="btn-info" (click)="viewCropDetails(crop)">
+          <span>Agronomic Details</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredCrops.length === 0">
+    <div class="empty-icon">🌾</div>
+    <h3 class="empty-title">No Crops Found</h3>
+    <p class="empty-desc">
+      No crops match the current search or filters. You can add a new crop to the catalog below.
+    </p>
+    <button class="btn-create" (click)="openAddModal()">
+      + Add New Crop to Catalog
+    </button>
+  </div>
+
+  <!-- Add Crop Modal -->
+  <div class="modal-backdrop" *ngIf="showAddModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Add Crop to Catalog</h2>
+          <p class="modal-subtitle">Save a new crop definition with seasonal and growth characteristics</p>
+        </div>
+        <button class="modal-close" (click)="closeAddModal()">&times;</button>
+      </div>
+
+      <form [formGroup]="cropForm" (ngSubmit)="saveCrop()" class="modal-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="crop_name">
+            <span>Crop Name</span>
+            <span class="required-star">*</span>
+          </label>
+          <input
+            id="crop_name"
+            type="text"
+            formControlName="crop_name"
+            placeholder="e.g. Basmati Rice, Durum Wheat, Soybean"
+            class="form-input"
+            [class.is-invalid]="cropForm.get('crop_name')?.invalid && cropForm.get('crop_name')?.touched"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="crop_season">
+              <span>Growing Season</span>
+              <span class="required-star">*</span>
+            </label>
+            <select id="crop_season" formControlName="crop_season" class="form-select">
+              <option value="Kharif">Kharif (Monsoon)</option>
+              <option value="Rabi">Rabi (Winter)</option>
+              <option value="Zaid">Zaid (Summer)</option>
+              <option value="Whole Year">Whole Year</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="crop_type">
+              <span>Category / Type</span>
+              <span class="required-star">*</span>
+            </label>
+            <select id="crop_type" formControlName="crop_type" class="form-select">
+              <option value="Cereal">Cereal</option>
+              <option value="Pulse">Pulse</option>
+              <option value="Cash Crop">Cash Crop</option>
+              <option value="Vegetable">Vegetable</option>
+              <option value="Oilseed">Oilseed</option>
+              <option value="Fiber">Fiber</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="growing_days">
+            <span>Growing Cycle (Days to Harvest)</span>
+            <span class="required-star">*</span>
+          </label>
+          <input
+            id="growing_days"
+            type="number"
+            min="10"
+            max="500"
+            formControlName="growing_days"
+            class="form-input"
+          />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeAddModal()">Cancel</button>
+          <button type="submit" [disabled]="isSaving" class="btn-save">
+            <span *ngIf="!isSaving">Add to Catalog</span>
+            <span *ngIf="isSaving">Saving...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Crop Quick Info Modal -->
+  <div class="modal-backdrop" *ngIf="viewingCrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="view-crop-title-wrap">
+          <span class="view-crop-icon">🌱</span>
+          <div>
+            <h2 class="modal-title">{{ viewingCrop.crop_name }}</h2>
+            <span class="view-crop-badge">{{ viewingCrop.crop_type }}</span>
+          </div>
+        </div>
+        <button class="modal-close" (click)="closeCropDetails()">&times;</button>
+      </div>
+
+      <div class="modal-body-content">
+        <div class="crop-info-grid">
+          <div class="info-cell">
+            <span class="cell-label">Primary Season</span>
+            <span class="cell-val">{{ viewingCrop.crop_season }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">Growing Cycle</span>
+            <span class="cell-val">{{ viewingCrop.growing_days }} Days</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">Crop Classification</span>
+            <span class="cell-val">{{ viewingCrop.crop_type }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">Suitability</span>
+            <span class="cell-val">General Cultivation</span>
+          </div>
+        </div>
+
+        <div class="agronomic-note">
+          <h4>💡 Agronomic Guidance:</h4>
+          <p>
+            Monitor soil moisture and nutrient levels during vegetative growth.
+            Refer to the <a routerLink="/crop-requirements" (click)="closeCropDetails()">Crop Requirements</a>
+            section for optimal irrigation, sunlight, and temperature guidelines.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-save" (click)="closeCropDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

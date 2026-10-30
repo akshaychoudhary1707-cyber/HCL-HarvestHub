@@ -1,0 +1,158 @@
+<div class="dashboard-page">
+  <!-- Page Header -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="badge-role">
+        <span class="pulse-dot"></span>
+        Welcome, <strong>{{ currentUser?.name }}</strong>
+      </div>
+      <h1 class="welcome-title">Agricultural Management Dashboard</h1>
+      <p class="welcome-subtitle">
+        Overview of your personal farms, seasonal crop plans, and agricultural intelligence.
+      </p>
+    </div>
+    <div class="welcome-actions">
+      <a routerLink="/farms" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Add Farm</span>
+      </a>
+      <a routerLink="/crop-plans" class="btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>View Plans</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Backend Warning if server offline -->
+  <div class="alert-offline" *ngIf="errorMessage">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+    <div class="alert-text">
+      <strong>Backend Connection Status:</strong> {{ errorMessage }}
+    </div>
+    <button (click)="loadDashboardData()" class="btn-retry">Retry Connection</button>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid">
+    <!-- Card 1: My Farms -->
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-name">My Farms</span>
+        <div class="icon-wrap icon-green">🌾</div>
+      </div>
+      <div class="metric-value">{{ myFarms.length }}</div>
+      <div class="metric-subtext">
+        <span>Total Area: <strong>{{ totalAcreage }}</strong> Acres</span>
+      </div>
+    </div>
+
+    <!-- Card 2: My Crop Plans -->
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-name">Crop Plans</span>
+        <div class="icon-wrap icon-amber">📋</div>
+      </div>
+      <div class="metric-value">{{ myCropPlans.length }}</div>
+      <div class="metric-subtext">
+        <span>Est. Yield: <strong>{{ totalExpectedYield | number }}</strong> kg</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Crops -->
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-name">Crops Catalog</span>
+        <div class="icon-wrap icon-blue">🌱</div>
+      </div>
+      <div class="metric-value">{{ totalCropsCount }}</div>
+      <div class="metric-subtext">
+        <span>Preloaded Reference Crops</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Crop Requirements -->
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-name">Crop Requirements</span>
+        <div class="icon-wrap icon-purple">💧</div>
+      </div>
+      <div class="metric-value">{{ totalRequirementsCount }}</div>
+      <div class="metric-subtext">
+        <span>Soil & Climate Benchmarks</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Split Grid -->
+  <div class="dashboard-split">
+    <!-- Left Section: Recent Farms -->
+    <div class="dashboard-section-card">
+      <div class="section-card-header">
+        <div>
+          <h2 class="card-title">Registered Farms</h2>
+          <p class="card-subtitle">Your active farm properties</p>
+        </div>
+        <a routerLink="/farms" class="link-view-all">View All ({{ myFarms.length }}) &rarr;</a>
+      </div>
+
+      <div class="farms-preview-list" *ngIf="myFarms.length > 0; else noFarmsTpl">
+        <div class="farm-preview-item" *ngFor="let farm of myFarms.slice(0, 4)">
+          <div class="farm-marker">🏡</div>
+          <div class="farm-info">
+            <h4 class="farm-name">{{ farm.farm_name }}</h4>
+            <span class="farm-meta">📍 {{ farm.farm_location }} &bull; {{ farm.area }} Acres &bull; {{ farm.soil_type }}</span>
+          </div>
+          <span class="tag-farm-season" *ngIf="farm.season">{{ farm.season }}</span>
+        </div>
+      </div>
+
+      <ng-template #noFarmsTpl>
+        <div class="empty-inline-state">
+          <p>No farms registered under your account yet.</p>
+          <a routerLink="/farms" class="btn-inline-action">+ Register Your First Farm</a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Right Section: Active Crop Plans -->
+    <div class="dashboard-section-card">
+      <div class="section-card-header">
+        <div>
+          <h2 class="card-title">Seasonal Crop Plans</h2>
+          <p class="card-subtitle">Plans generated for your farms</p>
+        </div>
+        <a routerLink="/crop-plans" class="link-view-all">View All ({{ myCropPlans.length }}) &rarr;</a>
+      </div>
+
+      <div class="plans-preview-list" *ngIf="myCropPlans.length > 0; else noPlansTpl">
+        <div class="plan-preview-item" *ngFor="let plan of myCropPlans.slice(0, 4)">
+          <div class="plan-marker">🌱</div>
+          <div class="plan-info">
+            <h4 class="plan-name">{{ plan.crop.crop_name }} on {{ plan.farm.farm_name }}</h4>
+            <span class="plan-meta">Season: {{ plan.season }} &bull; Yield: {{ plan.expected_yield_kg | number }} kg</span>
+          </div>
+          <span class="season-badge">{{ plan.season }}</span>
+        </div>
+      </div>
+
+      <ng-template #noPlansTpl>
+        <div class="empty-inline-state">
+          <p>No crop plans generated yet. Register a farm to automatically create one.</p>
+          <a routerLink="/farms" class="btn-inline-action">+ Register a Farm</a>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

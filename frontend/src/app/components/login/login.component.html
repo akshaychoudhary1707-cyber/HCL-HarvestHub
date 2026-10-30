@@ -1,0 +1,96 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Brand & Header -->
+      <div class="auth-header">
+        <div class="brand-badge">
+          <span class="seedling-icon">🌱</span>
+          <span class="hub-name">HarvestHub</span>
+        </div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to manage your farms and crop plans</p>
+      </div>
+
+      <!-- Error Notification Alert -->
+      <div class="alert-error" *ngIf="errorMessage">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="username" class="form-label">
+            <span>Username</span>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <input
+              id="username"
+              type="text"
+              formControlName="name"
+              placeholder="Enter your registered name"
+              class="form-input"
+              [class.is-invalid]="loginForm.get('name')?.invalid && loginForm.get('name')?.touched"
+            />
+          </div>
+          <div class="invalid-feedback" *ngIf="loginForm.get('name')?.invalid && loginForm.get('name')?.touched">
+            Username is required (min 2 characters).
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">
+            <span>Password</span>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              placeholder="Enter your password"
+              class="form-input"
+              [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            />
+          </div>
+          <div class="invalid-feedback" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Password is required (min 3 characters).
+          </div>
+        </div>
+
+        <div class="form-actions-row">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="rememberMe" />
+            <span>Keep me logged in</span>
+          </label>
+        </div>
+
+        <button type="submit" [disabled]="isLoading" class="btn-submit">
+          <span *ngIf="!isLoading">Log In</span>
+          <span *ngIf="isLoading" class="spinner-wrap">
+            <span class="spinner"></span> Signing in...
+          </span>
+        </button>
+      </form>
+
+      <!-- Footer switch link -->
+      <div class="auth-footer">
+        <span>Don't have an account yet?</span>
+        <a routerLink="/signup" class="link-primary">Create an account</a>
+      </div>
+    </div>
+  </div>
+</div>

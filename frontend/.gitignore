@@ -1,0 +1,11 @@
+# Angular build and cache
+/dist/
+/.angular/
+/node_modules/
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store

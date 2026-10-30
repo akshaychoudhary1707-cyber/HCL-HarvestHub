@@ -1,0 +1,190 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">Seasonal Crop Plans</h1>
+      <p class="page-subtitle">Automatically optimized crop recommendations and yield forecasts for your registered farms.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/farms" class="btn-create">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Register New Farm</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="stats-strip">
+    <div class="stat-pill">
+      <span class="pill-title">Active Crop Plans:</span>
+      <span class="pill-number">{{ cropPlans.length }}</span>
+    </div>
+    <div class="stat-pill">
+      <span class="pill-title">Total Expected Yield:</span>
+      <span class="pill-number">{{ totalExpectedYield | number }} kg</span>
+    </div>
+  </div>
+
+  <!-- Missing Farms Warning if user has no farms -->
+  <div class="alert-warning" *ngIf="!isLoading && userFarms.length === 0">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <div class="alert-content">
+      <strong>No registered farms found!</strong>
+      <span>Register a farm first to automatically generate optimal crop plans.</span>
+    </div>
+    <a routerLink="/farms" class="btn-link-action">+ Register Farm</a>
+  </div>
+
+  <!-- Toolbar & Filters -->
+  <div class="toolbar">
+    <div class="filter-group">
+      <span class="filter-label">Filter Season:</span>
+      <div class="season-pills">
+        <button
+          *ngFor="let s of seasons"
+          (click)="selectedSeasonFilter = s"
+          [class.active]="selectedSeasonFilter === s"
+          class="season-pill-btn"
+        >
+          {{ s }}
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-group" *ngIf="userFarms.length > 1">
+      <span class="filter-label">Filter Farm:</span>
+      <select [(ngModel)]="selectedFarmFilter" class="select-filter">
+        <option value="All">All Farms</option>
+        <option *ngFor="let f of userFarms" [value]="f.farm_name">{{ f.farm_name }}</option>
+      </select>
+    </div>
+
+    <span class="count-badge">Showing {{ filteredPlans.length }} of {{ cropPlans.length }}</span>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="alert-error" *ngIf="errorMessage">
+    <span>{{ errorMessage }}</span>
+    <button (click)="loadData()" class="btn-retry">Retry</button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your crop plans...</p>
+  </div>
+
+  <!-- Plans Grid -->
+  <div class="plans-grid" *ngIf="!isLoading && filteredPlans.length > 0">
+    <div class="plan-card" *ngFor="let plan of filteredPlans">
+      <!-- Card Top: Recommended Crop & Season -->
+      <div class="plan-card-top">
+        <div class="plan-crop-badge">
+          <span class="crop-icon">🌱</span>
+          <div class="crop-titles">
+            <span class="recommendation-badge">Recommended Crop</span>
+            <h3 class="crop-name">{{ plan.crop.crop_name || 'Selected Crop' }}</h3>
+            <span class="crop-sub">{{ plan.crop.crop_type }}</span>
+          </div>
+        </div>
+        <span class="season-badge">{{ plan.season }}</span>
+      </div>
+
+      <!-- Plan Agronomic Specification Details -->
+      <div class="plan-details">
+        <div class="detail-row">
+          <span class="label">Assigned Farm</span>
+          <span class="val font-semibold">🏡 {{ plan.farm.farm_name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Farm Location</span>
+          <span class="val">📍 {{ plan.farm.farm_location }} ({{ plan.farm.area }} Acres)</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Growth Duration</span>
+          <span class="val">⏳ <strong>{{ plan.growth_duration || plan.crop.growing_days }}</strong> Days</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Water Requirement</span>
+          <span class="water-tag">💧 {{ plan.water_requirement || plan.requirement?.water_requirement || 'Moderate' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Soil Requirement</span>
+          <span class="soil-tag">🏞️ {{ plan.soil_requirement || plan.requirement?.soil_type || plan.farm.soil_type }}</span>
+        </div>
+        <div class="detail-row" *ngIf="plan.requirement?.sunlight">
+          <span class="label">Sunlight Exposure</span>
+          <span class="val">☀️ {{ plan.requirement?.sunlight }}</span>
+        </div>
+        <div class="detail-row" *ngIf="plan.requirement?.temperature">
+          <span class="label">Optimum Temperature</span>
+          <span class="val">🌡️ {{ plan.requirement?.temperature }}°C</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Expected Harvest Yield</span>
+          <span class="yield-tag"><strong>{{ plan.expected_yield_kg | number }}</strong> kg</span>
+        </div>
+        <div class="fertilizer-box">
+          <span class="fertilizer-label">🌿 Fertilizer Requirement:</span>
+          <p class="fertilizer-text">{{ plan.fertilizer_requirement || 'Balanced NPK Formulation with Organic Compost' }}</p>
+        </div>
+      </div>
+
+      <!-- Plan Actions -->
+      <div class="plan-actions">
+        <span class="auto-tag">✓ Automatically Generated</span>
+        <button
+          class="btn-delete-plan"
+          (click)="deletePlan(plan.plan_id)"
+          [disabled]="deletingPlanId === plan.plan_id"
+          title="Delete Crop Plan"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Remove Plan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredPlans.length === 0">
+    <div class="empty-icon">📋</div>
+    <h3 class="empty-title">No Crop Plans Generated</h3>
+    <p class="empty-desc" *ngIf="userFarms.length > 0">
+      You have registered farms. Click below to generate an optimized crop plan.
+    </p>
+    <p class="empty-desc" *ngIf="userFarms.length === 0">
+      Register a farm to automatically generate your first crop plan.
+    </p>
+
+    <div class="empty-actions" *ngIf="userFarms.length > 0">
+      <div class="farm-generate-list">
+        <div class="farm-gen-item" *ngFor="let farm of userFarms">
+          <span>{{ farm.farm_name }} ({{ farm.area }} Acres, {{ farm.soil_type }})</span>
+          <button
+            class="btn-generate-inline"
+            (click)="generateCropPlan(farm)"
+            [disabled]="generatingForFarmId === farm.farm_id"
+          >
+            <span *ngIf="generatingForFarmId !== farm.farm_id">Generate Plan</span>
+            <span *ngIf="generatingForFarmId === farm.farm_id">Generating...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <a routerLink="/farms" class="btn-create" *ngIf="userFarms.length === 0">
+      + Register Your First Farm
+    </a>
+  </div>
+</div>

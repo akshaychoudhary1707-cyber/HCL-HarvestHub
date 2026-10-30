@@ -1,0 +1,113 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Brand & Header -->
+      <div class="auth-header">
+        <div class="brand-badge">
+          <span class="seedling-icon">🌱</span>
+          <span class="hub-name">HarvestHub</span>
+        </div>
+        <h1 class="auth-title">Create an Account</h1>
+        <p class="auth-subtitle">Join HarvestHub to start planning and managing your farms</p>
+      </div>
+
+      <!-- Error Notification Alert -->
+      <div class="alert-error" *ngIf="errorMessage">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Signup Form -->
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="reg-username" class="form-label">
+            <span>Username</span>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <input
+              id="reg-username"
+              type="text"
+              formControlName="name"
+              placeholder="e.g. John Doe, Green Acres"
+              class="form-input"
+              [class.is-invalid]="signupForm.get('name')?.invalid && signupForm.get('name')?.touched"
+            />
+          </div>
+          <div class="invalid-feedback" *ngIf="signupForm.get('name')?.invalid && signupForm.get('name')?.touched">
+            Username is required (min 2 characters).
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password" class="form-label">
+            <span>Password</span>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              id="reg-password"
+              type="password"
+              formControlName="password"
+              placeholder="Create a secure password"
+              class="form-input"
+              [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+            />
+          </div>
+          <div class="invalid-feedback" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+            Password is required (min 3 characters).
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-confirm" class="form-label">
+            <span>Confirm Password</span>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <input
+              id="reg-confirm"
+              type="password"
+              formControlName="confirmPassword"
+              placeholder="Re-enter your password"
+              class="form-input"
+              [class.is-invalid]="(signupForm.get('confirmPassword')?.touched && signupForm.hasError('mismatch')) || (signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched)"
+            />
+          </div>
+          <div class="invalid-feedback" *ngIf="signupForm.get('confirmPassword')?.touched && signupForm.hasError('mismatch')">
+            Passwords do not match.
+          </div>
+        </div>
+
+        <button type="submit" [disabled]="isLoading" class="btn-submit">
+          <span *ngIf="!isLoading">Create Account & Sign In</span>
+          <span *ngIf="isLoading" class="spinner-wrap">
+            <span class="spinner"></span> Creating account...
+          </span>
+        </button>
+      </form>
+
+      <!-- Footer switch link -->
+      <div class="auth-footer">
+        <span>Already have an account?</span>
+        <a routerLink="/login" class="link-primary">Sign In</a>
+      </div>
+    </div>
+  </div>
+</div>

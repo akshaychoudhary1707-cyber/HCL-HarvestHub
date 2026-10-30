@@ -1,0 +1,241 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">My Farms</h1>
+      <p class="page-subtitle">Manage your personal agricultural land parcels and soil profiles.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-create" (click)="openAddModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Add New Farm</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="stats-strip">
+    <div class="stat-pill">
+      <span class="pill-title">Total Registered Farms:</span>
+      <span class="pill-number">{{ farms.length }}</span>
+    </div>
+    <div class="stat-pill">
+      <span class="pill-title">Total Land Area:</span>
+      <span class="pill-number">{{ totalAcreage }} Acres</span>
+    </div>
+  </div>
+
+  <!-- Search & Toolbar -->
+  <div class="toolbar">
+    <div class="search-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Filter your farms by name, location, or soil..."
+        class="search-input"
+      />
+    </div>
+    <span class="count-badge">Showing {{ filteredFarms.length }} of {{ farms.length }}</span>
+  </div>
+
+  <!-- Error Message Alert -->
+  <div class="alert-error" *ngIf="errorMessage">
+    <span>{{ errorMessage }}</span>
+    <button (click)="loadFarms()" class="btn-retry">Retry</button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your farms...</p>
+  </div>
+
+  <!-- Farms Cards Grid -->
+  <div class="farms-grid" *ngIf="!isLoading && filteredFarms.length > 0">
+    <div class="farm-card" *ngFor="let farm of filteredFarms">
+      <div class="card-top">
+        <div class="farm-avatar">🌾</div>
+        <div class="farm-heading">
+          <h3 class="farm-title">{{ farm.farm_name }}</h3>
+          <span class="farm-loc">📍 {{ farm.farm_location }}</span>
+        </div>
+        <span class="farm-season-pill" *ngIf="farm.season">{{ farm.season }}</span>
+      </div>
+
+      <div class="card-details">
+        <div class="detail-row">
+          <span class="detail-label">Total Land Area</span>
+          <span class="detail-val"><strong>{{ farm.area }}</strong> Acres</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Soil Classification</span>
+          <span class="soil-tag">{{ farm.soil_type }}</span>
+        </div>
+        <div class="detail-row" *ngIf="farm.season">
+          <span class="detail-label">Target Season</span>
+          <span class="detail-val">{{ farm.season }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-plan-crop" (click)="viewCropPlanForFarm(farm)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>View Generated Plan</span>
+        </button>
+        <button
+          class="btn-delete"
+          (click)="deleteFarm(farm.farm_id)"
+          [disabled]="deletingFarmId === farm.farm_id"
+          title="Delete Farm"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredFarms.length === 0">
+    <div class="empty-icon">🌾</div>
+    <h3 class="empty-title">No Farms Registered</h3>
+    <p class="empty-desc" *ngIf="!searchQuery">
+      You haven't registered any farms yet. Register your farm below to automatically generate an optimized seasonal crop plan.
+    </p>
+    <p class="empty-desc" *ngIf="searchQuery">
+      No farms match the filter "{{ searchQuery }}".
+    </p>
+    <button class="btn-create" (click)="openAddModal()" *ngIf="!searchQuery">
+      + Register Your First Farm
+    </button>
+  </div>
+
+  <!-- Add Farm Modal -->
+  <div class="modal-backdrop" *ngIf="showAddModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Register New Farm</h2>
+          <p class="modal-subtitle">Enter your land details to automatically generate an optimal crop plan</p>
+        </div>
+        <button class="modal-close" (click)="closeAddModal()">&times;</button>
+      </div>
+
+      <form [formGroup]="farmForm" (ngSubmit)="saveFarm()" class="modal-form" novalidate>
+        <!-- Farm Name -->
+        <div class="form-group">
+          <label class="form-label" for="farm_name">
+            <span>Farm Name</span>
+            <span class="required-star">*</span>
+          </label>
+          <input
+            id="farm_name"
+            type="text"
+            formControlName="farm_name"
+            placeholder="e.g. Green Meadows, Sunny Valley Acres"
+            class="form-input"
+            [class.is-invalid]="farmForm.get('farm_name')?.invalid && farmForm.get('farm_name')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="farmForm.get('farm_name')?.invalid && farmForm.get('farm_name')?.touched">
+            Farm name is required.
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label class="form-label" for="farm_location">
+            <span>Location / Region</span>
+            <span class="required-star">*</span>
+          </label>
+          <input
+            id="farm_location"
+            type="text"
+            formControlName="farm_location"
+            placeholder="e.g. Punjab, Nashik, Maharashtra, Iowa"
+            class="form-input"
+            [class.is-invalid]="farmForm.get('farm_location')?.invalid && farmForm.get('farm_location')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="farmForm.get('farm_location')?.invalid && farmForm.get('farm_location')?.touched">
+            Location is required.
+          </div>
+        </div>
+
+        <!-- Area & Season -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="farm_area">
+              <span>Total Area (Acres)</span>
+              <span class="required-star">*</span>
+            </label>
+            <input
+              id="farm_area"
+              type="number"
+              step="0.5"
+              min="0.1"
+              formControlName="area"
+              class="form-input"
+              [class.is-invalid]="farmForm.get('area')?.invalid && farmForm.get('area')?.touched"
+            />
+            <div class="invalid-feedback" *ngIf="farmForm.get('area')?.invalid && farmForm.get('area')?.touched">
+              Area must be greater than 0.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="farm_season">
+              <span>Growing Season</span>
+              <span class="required-star">*</span>
+            </label>
+            <select id="farm_season" formControlName="season" class="form-select">
+              <option *ngFor="let s of seasons" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Soil Type -->
+        <div class="form-group">
+          <label class="form-label" for="soil_type">
+            <span>Primary Soil Type</span>
+            <span class="required-star">*</span>
+          </label>
+          <select id="soil_type" formControlName="soil_type" class="form-select">
+            <option *ngFor="let soil of soilTypes" [value]="soil">{{ soil }}</option>
+          </select>
+        </div>
+
+        <div class="form-info-callout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>
+            Upon registration, the agronomic recommendation engine will match your soil, season, and location against crop requirements to automatically generate an optimal crop plan.
+          </span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeAddModal()">Cancel</button>
+          <button type="submit" [disabled]="isSaving" class="btn-save">
+            <span *ngIf="!isSaving">Register Farm & Generate Plan</span>
+            <span *ngIf="isSaving">Analyzing & Generating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

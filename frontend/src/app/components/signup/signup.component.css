@@ -1,0 +1,231 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0fdf4 0%, #e2e8f0 100%);
+  padding: 24px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-subtle);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-100);
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.seedling-icon {
+  font-size: 1.25rem;
+}
+
+.hub-name {
+  font-weight: 800;
+  color: var(--primary-800);
+  font-size: 0.95rem;
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary-900);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required-star {
+  color: #ef4444;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-light);
+  pointer-events: none;
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 14px 11px 42px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--text-main);
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+}
+
+.form-input.is-invalid {
+  border-color: #ef4444;
+}
+
+.invalid-feedback {
+  font-size: 0.78rem;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.registration-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--primary-50);
+  border: 1px solid var(--primary-100);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--primary-900);
+  line-height: 1.4;
+}
+
+.registration-note svg {
+  color: var(--primary-700);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.registration-note code {
+  background: var(--primary-100);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  color: var(--primary-900);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary-700);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(46, 125, 50, 0.2);
+  margin-top: 6px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--primary-800);
+  box-shadow: 0 6px 12px -2px rgba(46, 125, 50, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.link-primary {
+  color: var(--primary-700);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
+}
+
