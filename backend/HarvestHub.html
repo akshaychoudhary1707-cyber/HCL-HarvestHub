@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HarvestHub - Precision Agricultural Management System</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-900: #143d18;
+      --primary-800: #1b5e20;
+      --primary-700: #2e7d32;
+      --primary-600: #388e3c;
+      --primary-500: #4caf50;
+      --primary-100: #e8f5e9;
+      --primary-50: #f1f8e9;
+      --accent-amber: #f59e0b;
+      --accent-amber-light: #fef3c7;
+      --accent-blue: #0284c7;
+      --accent-blue-light: #e0f2fe;
+      --bg-main: #f4f6f8;
+      --bg-card: #ffffff;
+      --border-subtle: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06);
+      --shadow-hover: 0 16px 24px -4px rgba(46,125,50,0.12);
+      --font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, select { font-family: inherit; }
+
+    /* Header */
+    .app-header { background: #ffffff; border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+    .header-container { max-width: 1400px; margin: 0 auto; padding: 0.85rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .brand-group { display: flex; align-items: center; gap: 0.85rem; cursor: pointer; }
+    .brand-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary-700), var(--primary-500)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.25); }
+    .brand-name { font-size: 1.35rem; font-weight: 800; color: var(--primary-900); }
+    .brand-tagline { font-size: 0.72rem; font-weight: 600; color: var(--primary-600); text-transform: uppercase; }
+
+    /* Nav Links */
+    .nav-links { display: flex; align-items: center; gap: 0.4rem; background: var(--bg-main); padding: 0.35rem; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); }
+    .nav-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 600; color: var(--text-muted); transition: all 0.2s ease; }
+    .nav-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.7); }
+    .nav-btn.active { background: #ffffff; color: var(--primary-700); box-shadow: var(--shadow-sm); }
+    .nav-btn.highlight-btn.active { background: linear-gradient(135deg, var(--primary-700), var(--primary-600)); color: #ffffff; }
+
+    .connection-status { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .connection-status.online { background: var(--primary-100); color: var(--primary-800); border: 1px solid rgba(46, 125, 50, 0.2); }
+    .connection-status.offline { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .online .status-dot { background: var(--success); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25); }
+    .offline .status-dot { background: var(--danger); }
+
+    /* Layout */
+    .app-body { max-width: 1400px; margin: 0 auto; padding: 2rem; width: 100%; }
+    .tab-pane { display: none; flex-direction: column; gap: 2rem; }
+    .tab-pane.active { display: flex; }
+
+    /* Hero */
+    .hero-card { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%); border-radius: var(--radius-xl); padding: 3rem; color: #ffffff; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 16px 32px -8px rgba(46, 125, 50, 0.3); }
+    .hero-content { max-width: 650px; }
+    .hero-chip { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.3rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1rem; }
+    .hero-title { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.85rem; }
+    .hero-subtitle { font-size: 1.05rem; opacity: 0.9; margin-bottom: 2rem; }
+    .hero-action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* Metrics */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+    .metric-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; display: flex; align-items: center; gap: 1.25rem; box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s; }
+    .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: rgba(46, 125, 50, 0.3); }
+    .metric-icon { width: 58px; height: 58px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+    .green-icon { background: var(--primary-100); color: var(--primary-700); }
+    .blue-icon { background: var(--accent-blue-light); color: var(--accent-blue); }
+    .amber-icon { background: var(--accent-amber-light); color: var(--accent-amber); }
+    .metric-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .metric-value { font-size: 2rem; font-weight: 800; color: var(--text-main); margin: 0.2rem 0; }
+    .metric-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Buttons */
+    .btn-primary { background: var(--primary-700); color: #ffffff; padding: 0.65rem 1.25rem; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2); }
+    .btn-primary:hover { background: var(--primary-800); }
+    .btn-secondary { background: #ffffff; color: var(--primary-800); padding: 0.65rem 1.25rem; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-subtle); }
+    .btn-outline { background: transparent; color: #ffffff; border: 1px solid rgba(255,255,255,0.4); padding: 0.65rem 1.25rem; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; }
+
+    /* Grids & Cards */
+    .view-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .view-title { font-size: 1.75rem; font-weight: 800; }
+    .view-sub { font-size: 0.95rem; color: var(--text-muted); }
+    .farms-grid, .crops-grid, .plans-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+    .card-item { background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; flex-direction: column; box-shadow: var(--shadow-sm); transition: all 0.2s; }
+    .card-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+    /* Badges */
+    .badge { font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px; }
+    .badge-loamy { background: #d1fae5; color: #065f46; }
+    .badge-alluvial { background: #dbeafe; color: #1e40af; }
+    .badge-black { background: #334155; color: #f8fafc; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-default { background: #f1f5f9; color: #475569; }
+
+    /* Analyzer */
+    .analyzer-workspace { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 1.5rem; }
+    .wizard-panel { background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; }
+    .step-num { width: 34px; height: 34px; border-radius: 50%; background: var(--primary-700); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+
+    /* Toast */
+    .toast-container { position: fixed; top: 80px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 0.75rem; }
+    .toast-item { background: #fff; padding: 1rem 1.25rem; border-radius: var(--radius-md); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 5px solid var(--success); min-width: 300px; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.6); display: none; align-items: center; justify-content: center; z-index: 500; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: #fff; border-radius: var(--radius-lg); width: 100%; max-width: 520px; padding: 1.75rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .form-label { font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
+    .form-control, .form-select { width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group" onclick="showTab('dashboard')">
+        <div class="brand-icon"><i class="fa-solid fa-seedling"></i></div>
+        <div>
+          <div class="brand-name">HarvestHub</div>
+          <div class="brand-tagline">Precision Agro Management</div>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" id="tab-btn-dashboard" onclick="showTab('dashboard')"><i class="fa-solid fa-chart-pie me-1"></i> Dashboard</button>
+        <button class="nav-btn" id="tab-btn-farms" onclick="showTab('farms')"><i class="fa-solid fa-tractor me-1"></i> Farms</button>
+        <button class="nav-btn" id="tab-btn-crops" onclick="showTab('crops')"><i class="fa-solid fa-wheat-awn me-1"></i> Crops</button>
+        <button class="nav-btn highlight-btn" id="tab-btn-analyzer" onclick="showTab('analyzer')"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> Smart Analyzer</button>
+        <button class="nav-btn" id="tab-btn-plans" onclick="showTab('plans')"><i class="fa-solid fa-clipboard-list me-1"></i> Active Plans</button>
+      </nav>
+
+      <div class="connection-status online" id="connectionBadge" onclick="checkBackendHealth()">
+        <span class="status-dot"></span>
+        <span id="connectionText">Spring Boot 9000 Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main Body -->
+  <main class="app-body">
+
+    <!-- Dashboard -->
+    <section class="tab-pane active" id="tab-dashboard">
+      <div class="hero-card">
+        <div class="hero-content">
+          <span class="hero-chip">Precision Agriculture Platform</span>
+          <h1 class="hero-title">Welcome to HarvestHub</h1>
+          <p class="hero-subtitle">Intelligently map farms, catalog crop requirements, and generate optimized production plans linked directly to your Spring Boot database.</p>
+          <div class="hero-action-buttons">
+            <button class="btn-primary" onclick="openModal('addFarmModal')"><i class="fa-solid fa-plus me-1"></i> Register Farm</button>
+            <button class="btn-secondary" onclick="showTab('analyzer')"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> Launch Analyzer</button>
+            <button class="btn-outline" onclick="openModal('addCropModal')"><i class="fa-solid fa-wheat-awn me-1"></i> Add Crop</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card" onclick="showTab('farms')">
+          <div class="metric-icon green-icon"><i class="fa-solid fa-tractor"></i></div>
+          <div>
+            <div class="metric-label">Registered Farms</div>
+            <div class="metric-value" id="dashTotalFarms">0</div>
+            <div class="metric-sub" id="dashTotalAcres">0 Total Acres</div>
+          </div>
+        </div>
+        <div class="metric-card" onclick="showTab('crops')">
+          <div class="metric-icon blue-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+          <div>
+            <div class="metric-label">Crop Catalog</div>
+            <div class="metric-value" id="dashTotalCrops">0</div>
+            <div class="metric-sub">Varieties Available</div>
+          </div>
+        </div>
+        <div class="metric-card" onclick="showTab('plans')">
+          <div class="metric-icon amber-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+          <div>
+            <div class="metric-label">Active Crop Plans</div>
+            <div class="metric-value" id="dashTotalPlans">0</div>
+            <div class="metric-sub">Committed Production Plans</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Farms -->
+    <section class="tab-pane" id="tab-farms">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Land Parcels & Farms</h2>
+          <p class="view-sub">Manage farm holdings, acreage, and soil classifications.</p>
+        </div>
+        <button class="btn-primary" onclick="openModal('addFarmModal')"><i class="fa-solid fa-plus me-1"></i> Register Farm</button>
+      </div>
+      <div class="farms-grid" id="farmsGrid"></div>
+    </section>
+
+    <!-- Crops -->
+    <section class="tab-pane" id="tab-crops">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Crop Varieties Catalog</h2>
+          <p class="view-sub">Explore crops, seasonal requirements, and maturity days.</p>
+        </div>
+        <button class="btn-primary" onclick="openModal('addCropModal')"><i class="fa-solid fa-plus me-1"></i> Add Crop</button>
+      </div>
+      <div class="crops-grid" id="cropsGrid"></div>
+    </section>
+
+    <!-- Analyzer -->
+    <section class="tab-pane" id="tab-analyzer">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Smart Crop Plan Analyzer</h2>
+          <p class="view-sub">Match farm soil texture with optimal crop varieties and generate foreign-key linked plans.</p>
+        </div>
+      </div>
+      <div class="analyzer-workspace">
+        <div class="wizard-panel">
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+            <div class="step-num">1</div>
+            <h3>Select Farm</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Registered Farm</label>
+            <select class="form-select" id="analyzerFarmSelect" onchange="onAnalyzerFarmSelect(this.value)">
+              <option value="">Choose a farm...</option>
+            </select>
+          </div>
+          <div id="analyzerFarmDetails" style="margin-top:1rem; font-size:0.85rem; color:var(--text-muted);"></div>
+        </div>
+
+        <div class="wizard-panel">
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+            <div class="step-num">2</div>
+            <h3>Recommended Crops</h3>
+          </div>
+          <div id="recommendedCropsList" style="display:flex; flex-direction:column; gap:0.75rem;">
+            <p style="color:var(--text-muted); font-size:0.85rem;">Select a farm on the left to analyze soil compatibility.</p>
+          </div>
+        </div>
+
+        <div class="wizard-panel" style="border: 2px solid var(--primary-600);">
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+            <div class="step-num">3</div>
+            <h3>Deploy Plan</h3>
+          </div>
+          <form onsubmit="deployCropPlan(event)">
+            <div class="form-group">
+              <label class="form-label">Season</label>
+              <select class="form-select" id="planSeason">
+                <option value="Kharif (Monsoon)">Kharif (Monsoon)</option>
+                <option value="Rabi (Winter)">Rabi (Winter)</option>
+                <option value="Zaid (Summer)">Zaid (Summer)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Yield (kg)</label>
+              <input type="number" class="form-control" id="planExpectedYield" required />
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%; margin-top:1rem;"><i class="fa-solid fa-rocket me-1"></i> Deploy & Save Plan</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plans -->
+    <section class="tab-pane" id="tab-plans">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Active Crop Plans</h2>
+          <p class="view-sub">All registered seasonal plans with Farm & Crop foreign keys.</p>
+        </div>
+        <button class="btn-primary" onclick="showTab('analyzer')"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> Generate Plan</button>
+      </div>
+      <div class="plans-grid" id="plansGrid"></div>
+    </section>
+
+  </main>
+
+  <!-- Add Farm Modal -->
+  <div class="modal-overlay" id="addFarmModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:1rem;"><i class="fa-solid fa-tractor me-2 text-success"></i>Register Farm</h3>
+      <form onsubmit="handleCreateFarm(event)">
+        <div class="form-group">
+          <label class="form-label">Farm Name *</label>
+          <input type="text" id="modalFarmName" class="form-control" required placeholder="e.g. Green Valley Farm" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location *</label>
+          <input type="text" id="modalFarmLocation" class="form-control" required placeholder="e.g. Fresno, California" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Area (Acres) *</label>
+          <input type="number" step="0.5" id="modalFarmArea" class="form-control" required value="10" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Soil Type *</label>
+          <select id="modalFarmSoil" class="form-select">
+            <option value="Loamy Soil">Loamy Soil</option>
+            <option value="Alluvial Soil">Alluvial Soil</option>
+            <option value="Black Cotton">Black Cotton</option>
+            <option value="Red & Laterite">Red & Laterite</option>
+            <option value="Clayey Soil">Clayey Soil</option>
+            <option value="Sandy Loam">Sandy Loam</option>
+          </select>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem;">
+          <button type="button" class="btn-secondary" onclick="closeModal('addFarmModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Save Farm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Crop Modal -->
+  <div class="modal-overlay" id="addCropModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:1rem;"><i class="fa-solid fa-wheat-awn me-2 text-success"></i>Add Crop Variety</h3>
+      <form onsubmit="handleCreateCrop(event)">
+        <div class="form-group">
+          <label class="form-label">Crop Name *</label>
+          <input type="text" id="modalCropName" class="form-control" required placeholder="e.g. Durum Wheat, Soybean" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Crop Season *</label>
+          <select id="modalCropSeason" class="form-select">
+            <option value="Kharif">Kharif (Monsoon)</option>
+            <option value="Rabi">Rabi (Winter)</option>
+            <option value="Zaid">Zaid (Summer)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Crop Type *</label>
+          <select id="modalCropType" class="form-select">
+            <option value="Cereal">Cereal</option>
+            <option value="Pulse / Legume">Pulse / Legume</option>
+            <option value="Cash Crop">Cash Crop</option>
+            <option value="Vegetable">Vegetable</option>
+            <option value="Oilseed">Oilseed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Maturity Days *</label>
+          <input type="number" id="modalCropDays" class="form-control" required value="120" />
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem;">
+          <button type="button" class="btn-secondary" onclick="closeModal('addCropModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Save Crop</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript API Client -->
+  <script>
+    const API_BASE = 'http://localhost:9000';
+    let globalFarms = [];
+    let globalCrops = [];
+    let globalPlans = [];
+    let selectedAnalyzerFarm = null;
+    let selectedCropForPlan = null;
+
+    // Toast helper
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = 'toast-item';
+      el.innerHTML = `<strong>HarvestHub:</strong> ${msg}`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // Modal helpers
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // Tab switcher
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.getElementById('tab-btn-' + tabId).classList.add('active');
+    }
+
+    // Health check
+    async function checkBackendHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/Farms/all`);
+        const badge = document.getElementById('connectionBadge');
+        const text = document.getElementById('connectionText');
+        if (res.ok) {
+          badge.className = 'connection-status online';
+          text.textContent = 'Spring Boot 9000 Online';
+        } else {
+          badge.className = 'connection-status offline';
+          text.textContent = 'Backend Error';
+        }
+      } catch (err) {
+        document.getElementById('connectionBadge').className = 'connection-status offline';
+        document.getElementById('connectionText').textContent = 'Backend Offline';
+      }
+    }
+
+    // Fetch all entities
+    async function loadAllData() {
+      await Promise.all([fetchFarms(), fetchCrops(), fetchPlans()]);
+      updateDashboardKPIs();
+    }
+
+    async function fetchFarms() {
+      try {
+        const res = await fetch(`${API_BASE}/Farms/all`);
+        globalFarms = await res.json();
+        renderFarms();
+        populateAnalyzerFarms();
+      } catch (e) { console.error("Error fetching farms:", e); }
+    }
+
+    async function fetchCrops() {
+      try {
+        const res = await fetch(`${API_BASE}/Crops/all`);
+        globalCrops = await res.json();
+        renderCrops();
+      } catch (e) { console.error("Error fetching crops:", e); }
+    }
+
+    async function fetchPlans() {
+      try {
+        let res = await fetch(`${API_BASE}/Crop_Plans/all`);
+        if (!res.ok) res = await fetch(`${API_BASE}/crop-plans/all`);
+        globalPlans = await res.json();
+        renderPlans();
+      } catch (e) { console.error("Error fetching plans:", e); }
+    }
+
+    function updateDashboardKPIs() {
+      document.getElementById('dashTotalFarms').textContent = globalFarms.length;
+      const totalAcres = globalFarms.reduce((a, b) => a + (b.area || 0), 0);
+      document.getElementById('dashTotalAcres').textContent = `${totalAcres} Cultivated Acres`;
+      document.getElementById('dashTotalCrops').textContent = globalCrops.length;
+      document.getElementById('dashTotalPlans').textContent = globalPlans.length;
+    }
+
+    function renderFarms() {
+      const container = document.getElementById('farmsGrid');
+      container.innerHTML = globalFarms.map(f => `
+        <div class="card-item">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-size:0.75rem; color:var(--text-muted);">ID: #${f.farm_id}</span>
+            <button onclick="deleteFarm(${f.farm_id})" style="color:var(--danger);"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          <h3 style="margin:0.5rem 0;">${f.farm_name}</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);"><i class="fa-solid fa-location-dot"></i> ${f.farm_location}</p>
+          <div style="margin:1rem 0; display:flex; justify-content:space-between; background:var(--bg-main); padding:0.6rem; border-radius:8px;">
+            <span><strong>${f.area}</strong> Acres</span>
+            <span class="badge badge-loamy">${f.soil_type}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCrops() {
+      const container = document.getElementById('cropsGrid');
+      container.innerHTML = globalCrops.map(c => `
+        <div class="card-item">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-size:0.75rem; color:var(--text-muted);">ID: #${c.id ?? c.crop_id}</span>
+            <button onclick="deleteCrop(${c.id ?? c.crop_id})" style="color:var(--danger);"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          <h3 style="margin:0.5rem 0;">${c.crop_name}</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">${c.crop_type} &bull; ${c.crop_season}</p>
+          <div style="margin:1rem 0; font-size:0.85rem;">Growing Duration: <strong>${c.growing_days} Days</strong></div>
+        </div>
+      `).join('');
+    }
+
+    function renderPlans() {
+      const container = document.getElementById('plansGrid');
+      container.innerHTML = globalPlans.map(p => `
+        <div class="card-item">
+          <div style="display:flex; justify-content:space-between;">
+            <span class="badge" style="background:var(--accent-amber-light); color:#b45309;">PLAN #${p.plan_id}</span>
+            <button onclick="deletePlan(${p.plan_id})" style="color:var(--danger);"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          <h3 style="margin:0.8rem 0;">${p.crop?.crop_name || 'Crop'} &bull; ${p.farm?.farm_name || 'Farm'}</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Season: ${p.season}</p>
+          <div style="margin-top:1rem; font-size:0.95rem; font-weight:700; color:var(--primary-700);">
+            🌾 Expected Yield: ${(p.expected_yield_kg || 0).toLocaleString()} kg
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function populateAnalyzerFarms() {
+      const select = document.getElementById('analyzerFarmSelect');
+      select.innerHTML = '<option value="">Choose a farm...</option>' + 
+        globalFarms.map(f => `<option value="${f.farm_id}">${f.farm_name} (${f.area} Acres, ${f.soil_type})</option>`).join('');
+    }
+
+    function onAnalyzerFarmSelect(farmId) {
+      selectedAnalyzerFarm = globalFarms.find(f => f.farm_id == farmId);
+      if (!selectedAnalyzerFarm) return;
+
+      document.getElementById('analyzerFarmDetails').innerHTML = `
+        <div style="background:var(--bg-main); padding:0.75rem; border-radius:8px;">
+          <div><strong>Location:</strong> ${selectedAnalyzerFarm.farm_location}</div>
+          <div><strong>Cultivable Area:</strong> ${selectedAnalyzerFarm.area} Acres</div>
+          <div><strong>Soil Texture:</strong> ${selectedAnalyzerFarm.soil_type}</div>
+        </div>
+      `;
+
+      // Smart match
+      const recList = document.getElementById('recommendedCropsList');
+      recList.innerHTML = globalCrops.map(crop => {
+        const estYield = Math.round(selectedAnalyzerFarm.area * 1500);
+        return `
+          <div class="card-item" style="cursor:pointer; padding:0.85rem;" onclick="selectAnalyzerCrop(${crop.id ?? crop.crop_id}, ${estYield}, '${crop.crop_season}')">
+            <div style="display:flex; justify-content:space-between;">
+              <strong>${crop.crop_name}</strong>
+              <span class="badge" style="background:#d1fae5; color:#065f46;">95% Match</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.3rem;">Optimal fit for ${selectedAnalyzerFarm.soil_type}.</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectAnalyzerCrop(cropId, estYield, season) {
+      selectedCropForPlan = globalCrops.find(c => (c.id ?? c.crop_id) == cropId);
+      document.getElementById('planExpectedYield').value = estYield;
+      if (season) document.getElementById('planSeason').value = season;
+      showToast(`Selected ${selectedCropForPlan.crop_name}. Projected yield: ${estYield.toLocaleString()} kg.`);
+    }
+
+    async function deployCropPlan(e) {
+      e.preventDefault();
+      if (!selectedAnalyzerFarm || !selectedCropForPlan) {
+        showToast('Please select both a farm and recommended crop!');
+        return;
+      }
+      const payload = {
+        farm: { farm_id: selectedAnalyzerFarm.farm_id },
+        crop: { id: selectedCropForPlan.id ?? selectedCropForPlan.crop_id },
+        season: document.getElementById('planSeason').value,
+        expected_yield_kg: parseInt(document.getElementById('planExpectedYield').value, 10)
+      };
+
+      try {
+        let res = await fetch(`${API_BASE}/Crop_Plans`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/crop-plans`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+        showToast('Crop Plan successfully created!');
+        await loadAllData();
+        showTab('plans');
+      } catch (err) {
+        showToast('Error saving plan: ' + err.message);
+      }
+    }
+
+    async function handleCreateFarm(e) {
+      e.preventDefault();
+      const farmData = {
+        farm_name: document.getElementById('modalFarmName').value,
+        farm_location: document.getElementById('modalFarmLocation').value,
+        area: parseFloat(document.getElementById('modalFarmArea').value),
+        soil_type: document.getElementById('modalFarmSoil').value
+      };
+      await fetch(`${API_BASE}/Farms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(farmData)
+      });
+      closeModal('addFarmModal');
+      showToast('Farm registered successfully!');
+      loadAllData();
+    }
+
+    async function handleCreateCrop(e) {
+      e.preventDefault();
+      const cropData = {
+        crop_name: document.getElementById('modalCropName').value,
+        crop_season: document.getElementById('modalCropSeason').value,
+        crop_type: document.getElementById('modalCropType').value,
+        growing_days: parseInt(document.getElementById('modalCropDays').value, 10)
+      };
+      await fetch(`${API_BASE}/Crops`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cropData)
+      });
+      closeModal('addCropModal');
+      showToast('Crop registered successfully!');
+      loadAllData();
+    }
+
+    async function deleteFarm(id) {
+      if (confirm('Delete farm #' + id + '?')) {
+        await fetch(`${API_BASE}/Farms/${id}`, { method: 'DELETE' });
+        showToast('Farm deleted.');
+        loadAllData();
+      }
+    }
+
+    async function deleteCrop(id) {
+      if (confirm('Delete crop #' + id + '?')) {
+        await fetch(`${API_BASE}/Crops/${id}`, { method: 'DELETE' });
+        showToast('Crop deleted.');
+        loadAllData();
+      }
+    }
+
+    async function deletePlan(id) {
+      if (confirm('Delete plan #' + id + '?')) {
+        await fetch(`${API_BASE}/Crop_Plans/${id}`, { method: 'DELETE' });
+        showToast('Plan deleted.');
+        loadAllData();
+      }
+    }
+
+    window.onload = () => {
+      checkBackendHealth();
+      loadAllData();
+    };
+  </script>
+</body>
+</html>
